@@ -113,13 +113,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- Main Content -->
         <div class="content">
+          <login-button attr-for-selector="data-route" selected="{{route}}">
+          </login-button>
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
             <section data-route="home">
               <paper-material elevation="1">
                 <my-greeting></my-greeting>
 
-                <login-button></login-button>
+
 
                 <p class="paper-font-subhead">You now have:</p>
                 <my-list></my-list>
@@ -200,7 +202,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
+  <script src="/compiled/output.js"></script>
   <!-- endbuild-->
 </body>
 

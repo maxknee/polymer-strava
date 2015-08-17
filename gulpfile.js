@@ -21,6 +21,11 @@ var path = require('path');
 var fs = require('fs');
 var glob = require('glob');
 var historyApiFallback = require('connect-history-api-fallback');
+var babel = require('gulp-babel');
+var browserify = require('browserify');
+var babelify = require('babelify');
+var source = require('vinyl-source-stream');
+
 
 var AUTOPREFIXER_BROWSERS = [
   'ie >= 10',
@@ -33,6 +38,17 @@ var AUTOPREFIXER_BROWSERS = [
   'android >= 4.4',
   'bb >= 10'
 ];
+
+gulp.task('modules', function() {
+  browserify({
+    entries: 'app/scripts/app.js',
+    debug: true
+  })
+  .transform(babelify)
+  .bundle()
+  .pipe(source('output.js'))
+  .pipe(gulp.dest('app/compiled'));
+});
 
 var styleTask = function (stylesPath, srcs) {
   return gulp.src(srcs.map(function(src) {
@@ -53,6 +69,12 @@ gulp.task('styles', function () {
 
 gulp.task('elements', function () {
   return styleTask('elements', ['**/*.css']);
+});
+
+gulp.task('babel', function() {
+  return gulp.src('app/scripts/**/*.js')
+  .pipe(babel())
+  .pipe(gulp.dest('app/compiled'));
 });
 
 // Lint JavaScript
@@ -175,10 +197,10 @@ gulp.task('precache', function (callback) {
 });
 
 // Clean Output Directory
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
+gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/compiled']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles', 'elements', 'images'], function () {
+gulp.task('serve', ['styles', 'elements', 'images', 'modules', 'babel'], function () {
   browserSync({
     notify: false,
     logPrefix: 'PSK',
@@ -212,6 +234,9 @@ gulp.task('serve', ['styles', 'elements', 'images'], function () {
 
 // Build and serve the output from the dist build
 gulp.task('serve:dist', ['default'], function () {
+  return gulp.src('app/scripts/**/*.js')
+  .pipe(babel())
+  .pipe(gulp.dest('dist')); 
   browserSync({
     notify: false,
     logPrefix: 'PSK',
@@ -235,6 +260,7 @@ gulp.task('serve:dist', ['default'], function () {
 // Build Production Files, the Default Task
 gulp.task('default', ['clean'], function (cb) {
   runSequence(
+    ['modules', 'babel'],
     ['copy', 'styles'],
     'elements',
     ['jshint', 'images', 'fonts', 'html'],
