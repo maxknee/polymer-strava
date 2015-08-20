@@ -7,7 +7,6 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <dom-module id="login-button">
   <template>
@@ -29,25 +28,56 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
     <paper-material>
       <div>
-        Hello from <button id=“click-me” on-click="handleClick">{{fart}}</button>
+        Hello from 
+        <button id=“click-me” on-click="clickme">{{fart}}</button>
+        <iron-ajax 
+          id="ajax"
+          url=""
+          handle-as="json"
+          on-response="hresponse"
+          debounce-duration="300">
+        </iron-ajax>
       </div>
       </paper-material>
 
   </template>
   <script>
   (function() {
+
     'use strict';
 
-   new Polymer({
+     var extractToken = function(hash) {
+      var match = hash.match(/access_token=(\w+)/);
+      return !!match && match[1];
+    };
+
+    var cred = {
+      host: 'https://strava.com',
+      clientId: 239,
+      redirectUrl: 'http://localhost:3000',
+      responseType: 'code'
+    };
+
+    var properLocal = encodeURI(cred.redirectUrl);
+
+    var oauthEndpoint = cred.host + '/oauth/authorize?';
+
+    Polymer({
       is: 'login-button',
 
-      handleClick: function() {
-        console.log('gonna pass strava oauth');
+      clickme: function(){
+        this.$.ajax.url = 'https://strava.com/oauth/authorize';
+        this.$.ajax.params = {'client_id': cred.clientId, 'redirect_uri': properLocal, 'response_type': cred.responseType, 'approval_prompt': 'auto'};
+        this.$.ajax.generateRequest()
+      },
+      hresponse: function(request) {
+        console.log(properLocal);
+        console.log(request.detail.response);
+        console.log(this.$.ajax.lastResponse);
       },
 
       ready: function(){
         this.textContext = 'Did i show up?';
-        console.log('hey');
       },
 
       properties: {

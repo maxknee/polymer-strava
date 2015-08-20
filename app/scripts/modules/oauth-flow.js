@@ -1,8 +1,12 @@
 'use strict';
 
-
-var oauth = {
-	//console.log('hey');
+var cred = {
+	host: 'strava.com',
+	clientId: 239,
+	redirectUrl: 'http://localhost',
+	responseType: 'code'
 };
 
-export default oauth;
+export function Oauth() {
+	return console.log(cred);
+}

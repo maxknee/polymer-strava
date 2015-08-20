@@ -3,9 +3,14 @@
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
-var oauth = {
-	//console.log('hey');
+exports.Oauth = Oauth;
+var cred = {
+	host: 'strava.com',
+	clientId: 239,
+	redirectUrl: 'http://localhost',
+	responseType: 'code'
 };
 
-exports['default'] = oauth;
-module.exports = exports['default'];
+function Oauth() {
+	return console.log(cred);
+}

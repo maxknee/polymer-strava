@@ -74,7 +74,7 @@ gulp.task('elements', function () {
 gulp.task('babel', function() {
   return gulp.src('app/scripts/**/*.js')
   .pipe(babel())
-  .pipe(gulp.dest('app/compiled'));
+  //.pipe(gulp.dest('app/compiled'));
 });
 
 // Lint JavaScript
@@ -200,7 +200,7 @@ gulp.task('precache', function (callback) {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/compiled']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles', 'elements', 'images', 'modules', 'babel'], function () {
+gulp.task('serve', ['styles', 'elements', 'images'], function () {
   browserSync({
     notify: false,
     logPrefix: 'PSK',
@@ -224,11 +224,11 @@ gulp.task('serve', ['styles', 'elements', 'images', 'modules', 'babel'], functio
       }
     }
   });
-
+  gulp.watch(['app/scripts/**/*.js'], ['babel', 'modules', reload]);
   gulp.watch(['app/**/*.html'], reload);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  gulp.watch(['app/{scripts,elements}/**/*.js'], ['jshint']);
+  gulp.watch(['app/{scripts,elements}/**/*.js'], ['jshint', reload]);
   gulp.watch(['app/images/**/*'], reload);
 });
 

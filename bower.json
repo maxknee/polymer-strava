@@ -2,6 +2,7 @@
   "name": "polymer-starter-kit",
   "private": true,
   "dependencies": {
+    "iron-ajax": "polymerelements/iron-ajax#~1.0.4",
     "iron-elements": "PolymerElements/iron-elements#~1.0.3",
     "paper-elements": "PolymerElements/paper-elements#~1.0.4",
     "platinum-elements": "PolymerElements/platinum-elements#1.0.1",
@@ -11,6 +12,7 @@
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "test-fixture": "PolymerElements/test-fixture#^1.0.0"
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0",
+    "iron-ajax": "polymerelements/iron-ajax#~1.0.4"
   }
 }
