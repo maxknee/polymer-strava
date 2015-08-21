@@ -37,7 +37,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           on-response="hresponse"
           debounce-duration="300">
         </iron-ajax>
+
+        <iron-ajax
+          id="tokenexchange"
+          url=""
+          handle-as="json"
+          method="POST"
+          body={{responseStuff.value}}
+          headers='{"Access-Control-Allow-Origin": "http://localhost", "Access-Control-Allow-Methods": "GET, POST", "Access-Control-Allow-Headers": "X-Custom-Header"}'
+          content-type='application/json'
+          on-response="tokenresponse">
+        </iron-ajax>
       </div>
+      <span>{{responseStuff.value.clientId}}</span>
       </paper-material>
 
   </template>
@@ -55,25 +67,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       host: 'https://strava.com',
       clientId: 239,
       redirectUrl: 'http://localhost:3000',
-      responseType: 'code'
+      responseType: 'code',
+      clientSecret: 'dbd8a92f126ed1a874218f17329f9432688769b2'
     };
 
     var properLocal = encodeURI(cred.redirectUrl);
 
-    var oauthEndpoint = cred.host + '/oauth/authorize?';
+    var parseUrl = function(url) {
+      console.log(url);
+      var query = location.search.substr(1);
+      var result = {};
+      query.split("&").forEach(function(part) {
+      var item = part.split("=");
+        result[item[0]] = decodeURIComponent(item[1]);
+      });
+      console.log(result);
+      return result;
+    };
 
-    Polymer({
+    var tokenized;
+
+    new Polymer({
       is: 'login-button',
 
       clickme: function(){
         this.$.ajax.url = 'https://strava.com/oauth/authorize';
         this.$.ajax.params = {'client_id': cred.clientId, 'redirect_uri': properLocal, 'response_type': cred.responseType, 'approval_prompt': 'auto'};
-        this.$.ajax.generateRequest()
+        this.$.ajax.generateRequest(this.$.ajax.url + this.$.ajax.params);
       },
+
       hresponse: function(request) {
         console.log(properLocal);
         console.log(request.detail.response);
         console.log(this.$.ajax.lastResponse);
+        var exchangedToken = window.location.href;
+        parseUrl(exchangedToken);
+        console.log(parseUrl(exchangedToken).code);
+        tokenized = parseUrl(exchangedToken).code;
+        this.$.tokenexchange.url = 'https://strava.com/oauth/token';
+        //this.$.tokenexchange.body = {"client_id": cred.clientId, "client_secret": cred.clientSecret, "code": parseUrl(exchangedToken).code};
+        console.log(this.$.tokenexchange);
+        this.$.tokenexchange.generateRequest(this.$.tokenexchange.url + this.$.tokenexchange.body);
+      },
+
+      tokenresponse: function(request) {
+        console.log(request.detail.response);
+        console.log(this.$.tokenexchange.lastResponse);
       },
 
       ready: function(){
@@ -85,6 +124,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           value: 'Hey Log in',
           notify: true,
+        },
+
+        responseStuff: {
+          type: String,
+          value: { 
+            client_id: cred.clientId,
+            client_secret: cred.clientSecret,
+            code: tokenized,
+          }
         }
       }
     });
